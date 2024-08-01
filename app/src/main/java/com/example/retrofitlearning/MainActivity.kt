@@ -1,5 +1,6 @@
 package com.example.retrofitlearning
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -71,6 +72,12 @@ class MainActivity : ComponentActivity() {
                     corScope.launch {
                         val user = productApi.auth(DataPostUser(30, password, login))
                         Log.i("INFOUSER", user.email)
+                        val intent=Intent(this@MainActivity,UserActivity::class.java)
+                        intent.putExtra("userlogin",user.username)
+                        intent.putExtra("userimage",user.image)
+                        intent.putExtra("userpassword",password)
+                        startActivity(intent)
+                        finish()
                     }
                 }) {
                     Text(text = "Войти")

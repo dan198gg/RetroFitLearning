@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.retrofitlearning.dataproduct.ProductApi
 import com.example.retrofitlearning.datauser.DataPostUser
+import com.example.retrofitlearning.datauser.UserSingleTon
 import com.example.retrofitlearning.ui.theme.RetroFitLearningTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -73,9 +74,9 @@ class MainActivity : ComponentActivity() {
                         val user = productApi.auth(DataPostUser(30, password, login))
                         Log.i("INFOUSER", user.email)
                         val intent=Intent(this@MainActivity,UserActivity::class.java)
-                        intent.putExtra("userlogin",user.username)
-                        intent.putExtra("userimage",user.image)
-                        intent.putExtra("userpassword",password)
+                        UserSingleTon.userLogin=login
+                        UserSingleTon.userPassword=password
+                        UserSingleTon.userImage=user.image
                         startActivity(intent)
                         finish()
                     }

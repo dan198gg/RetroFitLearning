@@ -3,45 +3,39 @@ package com.example.retrofitlearning
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.retrofitlearning.dataproduct.ProductApi
 import com.example.retrofitlearning.datauser.DataPostUser
 import com.example.retrofitlearning.datauser.UserSingleTon
-import com.example.retrofitlearning.ui.theme.RetroFitLearningTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import okio.Okio
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 
 class MainActivity : ComponentActivity() {
     var login by
@@ -67,21 +61,38 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val corScope = rememberCoroutineScope()
-            Column(modifier = Modifier.padding(0.dp,50.dp)) {
-                TextFieldsForUsers()
-                Button(onClick = {
-                    corScope.launch {
-                        val user = productApi.auth(DataPostUser(30, password, login))
-                        Log.i("INFOUSER", user.email)
-                        val intent=Intent(this@MainActivity,UserActivity::class.java)
-                        UserSingleTon.userLogin=login
-                        UserSingleTon.userPassword=password
-                        UserSingleTon.userImage=user.image
-                        startActivity(intent)
-                        finish()
+
+            Text(text = "Войти", modifier = Modifier.fillMaxWidth().padding(0.dp,50.dp), textAlign = TextAlign.Center, fontSize = 40.sp)
+            Box(modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center) {
+                Column{
+                    TextFieldsForUsers()
+                    Button(onClick = {
+                        corScope.launch {
+                            try {
+                                val user = productApi.auth(DataPostUser(30, password, login))
+                                Log.i("INFOUSER", user.email)
+                                val intent = Intent(this@MainActivity, UserActivity::class.java)
+                                UserSingleTon.userLogin = login
+                                UserSingleTon.userEmail = user.email
+                                UserSingleTon.userImage = user.image
+                                UserSingleTon.userGender = user.gender
+                                startActivity(intent)
+                                finish()
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    "Ошибка, попробуйте еще раз!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    },
+                        modifier = Modifier
+                            .padding(0.dp, 30.dp)
+                            .align(Alignment.CenterHorizontally)) {
+                        Text(text = "Войти")
                     }
-                }) {
-                    Text(text = "Войти")
                 }
             }
         }
@@ -102,6 +113,7 @@ class MainActivity : ComponentActivity() {
                 placeholder = { Text(text = "Введите пароль...") },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                , modifier = Modifier.padding(0.dp,30.dp)
             )
         }
     }
